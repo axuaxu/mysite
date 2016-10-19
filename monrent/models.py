@@ -103,4 +103,5 @@ class Monrent(models.Model):
     #       s = self.name
         return u'title: %s' %  self.title
 
-
+    def pcode3(self):
+        return self.pcode[:3]

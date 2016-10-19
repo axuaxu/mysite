@@ -7,7 +7,7 @@ from .models import Monrent
 # Register your models here.
 
 class MonrentAdmin(admin.ModelAdmin):
-     list_display = ('num','udate','title','address','pcode','rent','rooms','rstyle','intime','method','length')
+     list_display = ('num','udate','title','address','pcode3','rent','rooms','rstyle','intime','method','length')
      list_filter = ('method','length','rooms','pcode')
 
 
