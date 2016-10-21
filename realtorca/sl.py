@@ -28,8 +28,11 @@ driver.get(murl)
 #elem.send_keys("Saint John,NB")
 #elem.send_keys(Keys.RETURN)
 #address0 = driver.find_element_by_xpath('m_property_dtl_address')
-pp = driver.find_element_by_id('m_property_dtl_info_hdr_price')
-print pp
+#pp = driver.find_element_by_id('m_property_dtl_info_hdr_price')
+#print pp
+pok = driver.find_element_by_id('closeKeywordIntro')
+pok.send_keys(Keys.RETURN)
+sleep(10)
 driver.close()
 #conn.commit()
 conn.close()
