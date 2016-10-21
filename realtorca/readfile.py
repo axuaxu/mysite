@@ -22,7 +22,9 @@ al = tree.xpath('//a/@href')
 alk = tree.xpath('//a[@class="property_lst_cnt_property_lnktop"]/@href')
 print address,price,price1,price2,link,num,addr1,link1,addr3,num0,alk[0]
 
-p = requests.get(alk[0])
+rl = alk[0].replace('https','http')
+print rl
+p = requests.get(rl)
 tree2 = html.fromstring(p.content)
 padd = tree2.xpath('//*[@id="m_property_dtl_address"]/text()')
 ll = tree2.xpath('//*[@id="landsize_value"]/text()')
