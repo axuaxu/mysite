@@ -6,9 +6,7 @@ def savepage(content,c,conn):
     tree = html.fromstring(content)
     address = tree.xpath('//span[@class="list_lst_address"]/text()')
     price = tree.xpath('//div[@class="m_property_lst_cnt_property_price"]/text()')
-    print address[3]
-    #c.execute("insert into mlist(address) values(?) ", (address[3],))
-    #conn.commit()
+
     link = tree.xpath('//div[@class="m_property_lst_hdr_lft"]/a/text()')
     mlsnum = tree.xpath('//div[@class="m_property_lst_cnt_property_listing_id"]/text()')
 
@@ -23,6 +21,7 @@ def savepage(content,c,conn):
     #print address,price,sales,desc,ptype,btype,landsize,bed,bath,len(bed),len(sales)
     storeys = ' '
     office = ' ' 
+
     bed = []
     bath = []
     sales = []
@@ -30,15 +29,15 @@ def savepage(content,c,conn):
         sbed = 'list_lst_bed'+str(i)
         sbath = 'list_lst_bath'+str(i)
         ssales = 'property_lst_cnt_realtor_details_realtor_lnk'+str(i)
-        #print i,sbed 
+        print i,sbed 
         try:
             bed.append(tree.xpath('//span[@id="'+sbed+'"]/text()'))
             bath.append(tree.xpath('//span[@id="'+sbath+'"]/text()'))
             sales.append(tree.xpath('//a[@id="'+ssales+'"]/text()'))
         except :
-            bed.append('0')
-            bath.append('0')
-            sales.append('')
+            bed.append(' ')
+            bath.append(' ')
+            sales.append(' ')
        
         o = i-1 
         iaddress = address[o]
@@ -49,7 +48,10 @@ def savepage(content,c,conn):
         iptype = ptype[o]
         ibtype = btype[o]
         iland = land[o]
-        iarea = area[o]
+        try:
+           iarea = area[o]
+        except IndexError:
+           iarea = " "
         isales = sales[o]
         idesc = desc[o]
 
@@ -59,24 +61,24 @@ def savepage(content,c,conn):
         #sinsert4 = 'btype['+i+'],land['+i+'],area['+i+'],"",sales['+i+'],"",desc['+i+'])'      
        
         sinsert = sinsert1+sinsert2
-        #print sinsert
+        print sinsert
         print iaddress,iprice,imlsnum
-        #c.execute(sinsert,(iaddress,iprice,imlsnum,ibed,ibath,iptype,ibtype,iland,iarea,storeys,isales,office,idesc))
-        #c.execute("insert into mlist(address,price,mlsnum,bed,bath,ptype,btype,land,area,storeys,sales,office,desc) values(?)",(iaddress,))
+        #c.execute(price,imlsnum,ibed,ibath,iptype,ibtype,iland,iarea,storeys,isales,office,idesc,))
+        c.execute('insert or ignore into sjlist(address,price,mlsnum,ptype,btype,land,area,desc) values (?,?,?,?,?,?,?,?)',(iaddress,iprice,imlsnum,iptype,ibtype,iland,iarea,idesc))
         conn.commit()
 sqlfile = "realtor.sqlite"
 conn = sqlite3.connect(sqlfile)
 conn.text_factory = bytes
 c = conn.cursor()
 j = 1
-for j in range(1,10):
-    filename ='/home/axu/Projects/testbox/realtor/up0'+str(j)+'.html' 
+for j in range(1,37):
+    filename ='/home/axu/Projects/testbox/realtor/sj'+str(j)+'.html' 
     print filename 
     with open (filename,'r') as f:
          page = f.read()
 
          savepage(page,c,conn)
-         #conn.commit()
+         conn.commit()
          f.close()
    
 conn.close()

@@ -2,7 +2,7 @@ from lxml import etree,html
 import requests
 import sqlite3
 
-def savepage(content,c):
+def savepage(content,c,conn):
     tree = html.fromstring(content)
     address = tree.xpath('//span[@class="list_lst_address"]/text()')
     price = tree.xpath('//div[@class="m_property_lst_cnt_property_price"]/text()')
@@ -35,9 +35,9 @@ def savepage(content,c):
             bath.append(tree.xpath('//span[@id="'+sbath+'"]/text()'))
             sales.append(tree.xpath('//a[@id="'+ssales+'"]/text()'))
         except :
-            bed.append('0')
-            bath.append('0')
-            sales.append('')
+            bed.append(' ')
+            bath.append(' ')
+            sales.append(' ')
        
         o = i-1 
         iaddress = address[o]
@@ -46,9 +46,15 @@ def savepage(content,c):
         ibed = bed[o]
         ibath = bath[o]
         iptype = ptype[o]
-        ibtype = btype[o]
+        try:
+             ibtype = btype[o]
+        except IndexError:
+             ibtype = " "
         iland = land[o]
-        iarea = area[o]
+        try:
+             iarea = area[o]
+        except IndexError:
+             iarea = " "
         isales = sales[o]
         idesc = desc[o]
 
@@ -60,20 +66,21 @@ def savepage(content,c):
         sinsert = sinsert1+sinsert2
         print sinsert
         print iaddress,iprice,imlsnum
-        #c.execute(sinsert,(iaddress,iprice,imlsnum,ibed,ibath,iptype,ibtype,iland,iarea,storeys,isales,office,idesc))
-
+        #c.execute(price,imlsnum,ibed,ibath,iptype,ibtype,iland,iarea,storeys,isales,office,idesc,))
+        c.execute('insert or ignore into mlist(address,price,mlsnum,ptype,btype,land,area,desc) values (?,?,?,?,?,?,?,?)',(iaddress,iprice,imlsnum,iptype,ibtype,iland,iarea,idesc))
+        conn.commit()
 sqlfile = "realtor.sqlite"
 conn = sqlite3.connect(sqlfile)
 conn.text_factory = bytes
 c = conn.cursor()
 j = 1
-for j in range(1,10):
-    filename ='/home/axu/Projects/testbox/realtor/up0'+str(j)+'.html' 
+for j in range(1,11):
+    filename ='/home/axu/Projects/testbox/realtor/up'+str(j)+'.html' 
     print filename 
     with open (filename,'r') as f:
          page = f.read()
 
-         savepage(page,c)
+         savepage(page,c,conn)
          conn.commit()
          f.close()
    
