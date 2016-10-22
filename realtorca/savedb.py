@@ -1,7 +1,7 @@
 from lxml import etree,html
 import requests
 import sqlite3
-
+import re
 def savepage(content,c,conn):
     tree = html.fromstring(content)
     address = tree.xpath('//span[@class="list_lst_address"]/text()')
@@ -14,7 +14,7 @@ def savepage(content,c,conn):
     btype = tree.xpath('//div[contains(@id,"list_lst_buildtype")]/text()')
     land  = tree.xpath('//div[contains(@id,"list_lst_landsizetotal")]/text()')
     area  = tree.xpath('//div[contains(@id,"list_lst_sizeinterior")]/text()')
-
+    
     desc = tree.xpath('//div[@class="m_property_lst_cnt_realtor_property_description"]/a/span/text()')
     #num0 = num[0][-8:]
     #print num,num0
@@ -41,7 +41,9 @@ def savepage(content,c,conn):
        
         o = i-1 
         iaddress = address[o]
-        iprice = price[o]
+        iprice = price[o].replace('$','')
+        iprice = iprice.replace(',','')
+        iprice = int(iprice)
         imlsnum = mlsnum[o][-8:]
         ibed = bed[o]
         ibath = bath[o]
@@ -54,9 +56,19 @@ def savepage(content,c,conn):
         try:
              iarea = area[o]
         except IndexError:
-             iarea = " "
+             iarea = "0"
+        iarea = iarea.replace('sqft','')
+        iarea = int(iarea)
+        try:
+             iland = int(re.findall("\d+",iland)[0]) 
+        except IndexError:
+             iland = 0 
+        print type(iland),iland
+ 
         isales = sales[o]
         idesc = desc[o]
+
+   
 
         sinsert1 = 'insert or ignore into mlist("address","price","mlsnum","bed","bath","ptype","btype","land","area","storeys","sales","office","desc") '
         sinsert2 = ' values (?,?,?,?,?,?,?,?,?,?,?,?,?) '
